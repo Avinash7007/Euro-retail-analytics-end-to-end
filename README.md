@@ -1,67 +1,114 @@
-# 📊 Euro Retail Analytics | Data Cleaning & Ingestion (Layer 1)
+# 🛒 EuroRetail Insights Platform
 
-This project focuses on **data cleaning and ingestion using Python (Pandas)** for a retail dataset.  
-It prepares raw data for further transformation in SQL Server and visualization in Power BI.
-
----
-
-## 📁 Project Structure
-
-Euro_Retail/  
-├── notebooks/  
-│   └── 01_data_cleaning_and_load.ipynb  (Layer 1: Data cleaning & ingestion)  
-│  
-├── data/  
-│   └── raw/                            (Store raw CSV files here)  
-│  
-├── README.md                           (Project documentation)  
-├── requirements.txt                    (pip install -r requirements.txt)  
-├── .env.example                        (Connection string template)  
-└── .gitignore                          (Ignore .env, raw data files)  
+End-to-end retail analytics pipeline: **Python → SQL Server → Power BI**
 
 ---
 
-## ⚙️ What This Layer Does
+## 📐 Project Architecture
 
-- Handles missing values (null treatment)  
-- Cleans inconsistent data  
-- Standardizes formats (dates, columns)  
-- Prepares structured datasets for SQL layer  
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     EuroRetail — 3-Layer Pipeline                       │
+│                                                                         │
+│  ✅ Layer 1 — PYTHON          ⏳ Layer 2 — SQL        ⏳ Layer 3 — BI  │
+│  ┌────────────────────┐       ┌──────────────────┐   ┌──────────────┐   │
+│  │  Data Cleaning     │  ───► │  SQL Server      │ ► │  Power BI    │   │
+│  │  + Load to SQL     │       │  Stored Procs    │   │  Dashboard   │   │
+│  │  (DONE ✅)         │       │  Views / DDL     │   │  Reports     │   │
+│  └────────────────────┘       └──────────────────┘   └──────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
+
+## 📁 Repository Structure
+
+```
+Euro_Retail/
+│
+├── notebooks/
+│   └── 01_data_cleaning_and_load.ipynb   ← Layer 1 (DONE ✅)
+│
+├── data/
+│   └── raw/                              
+│       ├── dim_customer.csv
+│       ├── dim_date.csv
+│       ├── dim_product.csv
+│       ├── dim_store.csv
+│       ├── fact_sales.csv
+│       ├── fact_returns.csv
+│       └── fact_shipments.csv
+│
+├── requirements.txt
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+---
+
+## ✅ Layer 1 — Python: Data Cleaning & SQL Load (COMPLETE)
+
+**Notebook:** `notebooks/01_data_cleaning_and_load.ipynb`
+
+### Tables Processed
+
+| Table | Cleaning Applied |
+|---|---|
+| `dim_customer` | Null `customer_name` / `city` → filled with sentinel strings |
+| `dim_date` | `date` column cast to `datetime64` |
+| `dim_product` | No nulls — validated clean |
+| `dim_store` | No nulls — validated clean |
+| `fact_sales` | Dropped derived cols; rows with null `order_date` dropped |
+| `fact_returns` | Rows with null `return_date` dropped; null `refund_amount` → 0 |
+| `fact_shipments` | Null `ship_cost` imputed with mean; rows with null `ship_date` dropped |
+
+### Flow
+```
+CSV Files → Load Raw → Clean Each Table → Load Clean Data to SQL Server
+```
+
+---
+
+## ⚙️ Setup
+
+### 1. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Configure environment
+```bash
+cp .env.example .env
+# Edit .env — set DATA_FOLDER path and SQL Server connection string
+```
+
+### 3. Place raw CSVs in `data/raw/`
+
+### 4. Open and run the notebook
+```bash
+jupyter notebook notebooks/01_data_cleaning_and_load.ipynb
+```
+
+---
+
+## ⏳ Coming Next
+
+- **Layer 2 — SQL Server:** DDL, stored procedures, views, star schema
+- **Layer 3 — Power BI:** KPI dashboard, sales / returns / shipments reports
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Tool |
+|---|---|
+| Data Cleaning | Python 3.x · pandas · Jupyter Notebook |
+| Database | SQL Server · SQLAlchemy · pyodbc |
+| Reporting | Power BI *(coming soon)* |
 
 ## 👤 Author
 
 **Avinash Dubey**  
 Data Analyst | 3+ Years Experience  
 SQL | Python | Power BI | Data Modeling | ETL  
-
----
-
-## 📌 Notes
-
-- Put all CSV files inside: `data/raw/`  
-- Raw data is not pushed to GitHub (ignored via `.gitignore`)  
-- This is the first step of a larger data pipeline  
-
----
-
-## 🚀 Setup
-
-- Clone repo  
-- Open project folder  
-- Run: `pip install -r requirements.txt`  
-- Open notebook and execute  
-
----
-
-## 🏷️ Tech Stack
-
-- Python (Pandas, NumPy)
-
----
-
-## 📊 Next Steps
-
-- SQL Server data modeling (Layer 2)  
-- Power BI dashboard (Layer 3)  
